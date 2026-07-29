@@ -9,7 +9,7 @@ import 'dart:convert';
 /// OTA 更新服务：从 GitHub Pages 检查版本，下载并安装新 APK
 class UpdateService {
   // 替换为你的 GitHub Pages 地址
-  static const _versionUrl = 'https://muchun1213-source.github.io/jizhang_app/version.json';
+  static const _versionUrl = 'https://rsreeuzxsxotybuuifyh.supabase.co/storage/v1/object/public/ota/version.json';
 
   /// 检查是否有新版本，返回 (有新版本, 下载地址, 版本号)
   static Future<(bool, String?, String?)> checkUpdate() async {
