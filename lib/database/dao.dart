@@ -45,6 +45,47 @@ class CategoryDao extends DatabaseAccessor<AppDatabase> with _$CategoryDaoMixin 
   }
 }
 
+/// 分类管理操作（不依赖 .g 生成，直接使用内部 db）
+class CategoryManager {
+  final AppDatabase _db;
+  CategoryManager(this._db);
+
+  Future<int> insertCategory({
+    required String name,
+    required String icon,
+    required String type,
+    int? parentId,
+  }) async {
+    final maxRow = await (_db
+        .selectOnly(_db.categories)
+        ..addColumns([_db.categories.sortOrder.max()])).getSingle();
+    final maxSort = maxRow.read(_db.categories.sortOrder.max()) ?? 0;
+
+    return _db.into(_db.categories).insert(
+      CategoriesCompanion.insert(
+        name: name,
+        icon: Value(icon),
+        type: Value(type),
+        parentId: Value(parentId),
+        sortOrder: Value(maxSort + 1),
+      ),
+    );
+  }
+
+  Future<void> deleteCategory(int id) async {
+    // 删除子分类
+    final children = await (_db.select(_db.categories)
+      ..where((t) => t.parentId.equals(id))).get();
+    for (final child in children) {
+      await (_db.delete(_db.categories)
+        ..where((t) => t.id.equals(child.id))).go();
+    }
+    // 删除自身
+    await (_db.delete(_db.categories)
+      ..where((t) => t.id.equals(id))).go();
+  }
+}
+
 /// 花销/收入记录相关操作
 @DriftAccessor(tables: [Expenses])
 class ExpenseDao extends DatabaseAccessor<AppDatabase> with _$ExpenseDaoMixin {

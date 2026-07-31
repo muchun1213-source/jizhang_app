@@ -16,7 +16,8 @@ class CategoryPicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final treeAsync = ref.watch(categoryTreeProvider);
+    final type = ref.watch(currentTypeProvider);
+    final treeAsync = ref.watch(categoryTreeProvider(type));
 
     return treeAsync.when(
       data: (tree) {

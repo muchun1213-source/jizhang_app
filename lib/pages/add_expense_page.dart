@@ -52,12 +52,24 @@ class _AddExpensePageState extends ConsumerState<AddExpensePage> {
     }
 
     final dao = ref.read(expenseDaoProvider);
-    await dao.addExpense(
+    final syncService = ref.read(syncServiceProvider);
+    final insertedId = await dao.addExpense(
       amount: amount,
       categoryId: _selectedCategory!.id,
       note: _noteController.text.isEmpty ? null : _noteController.text,
       expenseDate: _selectedDate,
     );
+
+    // 自动上传到云端
+    final db = ref.read(databaseProvider);
+    final newRecord = await (db.select(db.expenses)..where((t) => t.id.equals(insertedId))).getSingleOrNull();
+    if (newRecord != null) {
+      try {
+        await syncService.uploadExpense(newRecord);
+      } catch (_) {
+        // 云端上传失败不阻塞本地操作
+      }
+    }
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('已记录')));

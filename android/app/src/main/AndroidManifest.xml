@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="ji_zhang_app"
+        android:label="Belle的钱袋子"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

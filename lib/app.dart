@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'pages/home_page.dart';
 import 'pages/add_expense_page.dart';
 import 'pages/stats_page.dart';
+import 'pages/settings_page.dart';
+import 'pages/category_manage_page.dart';
+import 'providers/settings_provider.dart';
 import 'services/update_service.dart';
 
 final router = GoRouter(
@@ -28,17 +32,19 @@ final router = GoRouter(
       ],
     ),
     GoRoute(path: '/add', builder: (_, __) => const AddExpensePage()),
+    GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
+    GoRoute(path: '/categories', builder: (_, __) => const CategoryManagePage()),
   ],
 );
 
-class JiZhangApp extends StatefulWidget {
+class JiZhangApp extends ConsumerStatefulWidget {
   const JiZhangApp({super.key});
 
   @override
-  State<JiZhangApp> createState() => _JiZhangAppState();
+  ConsumerState<JiZhangApp> createState() => _JiZhangAppState();
 }
 
-class _JiZhangAppState extends State<JiZhangApp> {
+class _JiZhangAppState extends ConsumerState<JiZhangApp> {
   @override
   void initState() {
     super.initState();
@@ -57,16 +63,18 @@ class _JiZhangAppState extends State<JiZhangApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = ref.watch(themeColorProvider);
+
     return MaterialApp.router(
-      title: '记账本',
+      title: 'Belle的钱袋子',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF4CAF50),
+        colorSchemeSeed: themeColor,
         useMaterial3: true,
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: const Color(0xFF4CAF50),
+        colorSchemeSeed: themeColor,
         useMaterial3: true,
         brightness: Brightness.dark,
       ),

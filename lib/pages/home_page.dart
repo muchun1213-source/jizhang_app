@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../providers/category_provider.dart';
 import '../providers/expense_provider.dart';
 import '../providers/stats_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/expense_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -89,7 +90,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                         isExpense: isExpense,
                         onDelete: () async {
                           final dao = ref.read(expenseDaoProvider);
-                          await dao.deleteExpense(list[i].expense.id);
+                          final syncService = ref.read(syncServiceProvider);
+                          final expenseId = list[i].expense.id;
+                          await dao.deleteExpense(expenseId);
+                          try {
+                            await syncService.deleteExpenseCloud(expenseId);
+                          } catch (_) {}
                           ref.invalidate(expenseByMonthProvider);
                         },
                       ),
@@ -122,6 +128,17 @@ class _HomePageState extends ConsumerState<HomePage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // 设置入口
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                tooltip: '设置',
+                onPressed: () => context.push('/settings'),
+              ),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
